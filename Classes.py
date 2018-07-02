@@ -57,19 +57,19 @@ class NewDB:  # Class permettant de créer la bdd
 
             cursor.execute("CREATE TABLE IF NOT EXISTS categories(id INT AUTO_INCREMENT PRIMARY KEY,"
                            "category VARCHAR(50))")
-            time.sleep(5)
+            time.sleep(2)
 
             cursor.execute("CREATE TABLE IF NOT EXISTS products(prod_id INT AUTO_INCREMENT PRIMARY KEY,"
                            "name VARCHAR(255), store VARCHAR(255),"
                            "grade VARCHAR(1), kcal_100g INT,"
-                           "cat_id INT, foreign key (cat_id) REFERENCES categories(id), link VARCHAR(255))")
+                           "cat_id INT, foreign key (cat_id) REFERENCES categories(id), link VARCHAR(255),"
+                           "description TEXT)")
 
-            time.sleep(5)
+            time.sleep(2)
 
-            cursor.execute("CREATE TABLE IF NOT EXISTS usr_products(prod_id INT,"
-                           "foreign key (prod_id) REFERENCES products(prod_id), name VARCHAR(255), store VARCHAR(255),"
-                           "grade VARCHAR(1), cat VARCHAR(50),"
-                           "cat_id INT, foreign key (cat_id) REFERENCES categories(id))")
+            cursor.execute("CREATE TABLE IF NOT EXISTS usr_products(id INT AUTO_INCREMENT PRIMARY KEY, prod_id INT,"
+                           "foreign key (prod_id) REFERENCES products(prod_id), prod_substitute_id INT,"
+                           "foreign key (prod_substitute_id) REFERENCES products(prod_id))")
 
         except mysql.connector.Error as err:
             print(err)
@@ -117,6 +117,7 @@ class NewDB:  # Class permettant de créer la bdd
                         Name = (products["products"][Prod]["product_name"])
                         Energy = (products["products"][Prod]["nutriments"]["energy_100g"])
                         Url = (products["products"][Prod]["url"])
+                        Desc = (products["products"][Prod]["generic_name"])
 
                         cursor.execute("SELECT id FROM categories WHERE category = %(cats)s", {'cats': Category})
 
@@ -133,8 +134,9 @@ class NewDB:  # Class permettant de créer la bdd
                             Url = "Inconnue"
 
 
-                        cursor.execute("INSERT INTO products (name, store, grade, kcal_100g, cat_id, link) VALUES (%s,"
-                                       "%s, %s, %s, %s, %s)", (Name, Store, Grade, Energy, cate_id, Url))
+                        cursor.execute("INSERT INTO products (name, store, grade, kcal_100g, cat_id, link,"
+                                       "description) VALUES (%s,"
+                                       "%s, %s, %s, %s, %s, %s)", (Name, Store, Grade, Energy, cate_id, Url, Desc))
 
 
                         cnx.commit()
