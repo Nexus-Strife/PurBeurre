@@ -17,7 +17,7 @@ class Client:
         cursor = cnx.cursor(dictionary=True)
         cursor.execute("SELECT category, id FROM categories")
 
-        time.sleep(3)
+        time.sleep(1)
         for row in cursor:
 
             print("{category}: {id}".format(**row))
@@ -39,11 +39,21 @@ class Client:
                                      "la liste des catégories (2)\nRetour au menu principal (3)"))
 
         if choice_menu_find == 1:
-            id_product = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez enregistrer: "))
-            print("Enregistrement en cours...")
-            cursor.execute("INSERT usr_products SELECT name, store, grade, cat, prod_id, cat_id FROM products WHERE prod_id = %s", (id_product, ))
-            cnx.commit()
-            self.menu()
+
+            another = 1
+            while another:
+                id_product = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez enregistrer: "))
+                print("Enregistrement en cours...")
+                cursor.execute("INSERT INTO usr_products (prod_id) VALUES (%s) ON DUPLICATE KEY UPDATE prod_id = prod_id", (id_product, ))
+                cnx.commit()
+                time.sleep(0.2)
+                go_again = int(input("\nVoulez-vous ajouter un autre produit ? \nOui (1)\nNon (2)"))
+                if go_again == 1:
+                    continue
+                elif go_again == 2:
+                    another = 0
+                    self.menu()
+
         elif choice_menu_find == 2:
             self.Catlist(cursor)
             time.sleep(0.5)
@@ -77,7 +87,7 @@ class Client:
         elif choice_menu_find == 4:
             id_product = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez enregistrer: "))
             print("Enregistrement en cours...")
-            cursor.execute("INSERT usr_products SELECT name, store, grade, cat, prod_id, cat_id FROM products WHERE prod_id = %s", (id_product, ))
+            cursor.execute("INSERT INTO usr_products (prod_id) VALUES (%s) ON DUPLICATE KEY UPDATE prod_id = prod_id", (id_product, ))
             cnx.commit()
             print("Retour au menu principal...")
             time.sleep(1)
@@ -109,7 +119,7 @@ class Client:
         cnx = mysql.connector.connect(**config)
         cursor = cnx.cursor(dictionary=True)
 
-        cursor.execute("SELECT name, store, grade, prod_id FROM usr_products")
+        cursor.execute("SELECT * FROM products INNER JOIN usr_products ON products.prod_id = usr_products.prod_id")
         for row in cursor:
             print("Nom: {name} | Magasin: {store} | Note: {grade} | ID du produit: {prod_id} | lien {link}".format(**row))
         time.sleep(0.5)
@@ -120,6 +130,7 @@ class Client:
             print("Suppression en cours...")
             time.sleep(0.5)
             cursor.execute("DELETE FROM usr_products WHERE prod_id = %s", (usr_del, ))
+            cnx.commit()
             print("Suppression faite !")
             time.sleep(0.5)
             self.usr_products(cursor)
