@@ -67,9 +67,10 @@ class NewDB:  # Class permettant de créer la bdd
 
             time.sleep(2)
 
-            cursor.execute("CREATE TABLE IF NOT EXISTS usr_products(id INT AUTO_INCREMENT PRIMARY KEY, prod_id INT,"
+            cursor.execute("CREATE TABLE IF NOT EXISTS usr_products(id INT AUTO_INCREMENT PRIMARY KEY, prod_id INT "
+                           "NOT NULL, UNIQUE (prod_id),"
                            "foreign key (prod_id) REFERENCES products(prod_id), prod_substitute_id INT,"
-                           "foreign key (prod_substitute_id) REFERENCES products(prod_id))")
+                           "foreign key (prod_id) REFERENCES products(prod_id))")
 
         except mysql.connector.Error as err:
             print(err)
