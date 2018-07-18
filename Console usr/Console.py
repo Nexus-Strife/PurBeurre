@@ -12,7 +12,7 @@ config = {
     'database': 'OpenFood'
 }
 
-read = Client()
+read = Console()
 
 running = 1
 
