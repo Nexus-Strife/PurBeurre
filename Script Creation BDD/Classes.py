@@ -76,7 +76,7 @@ class NewDB:  # Class that create the database
 
         nbr_categories = categories["count"]
         nbr_of_cats = int(input("Combien de catégories voulez vous injecter dans la BDD ? "))
-        nbr_of_pages = int(input("Combien de page par catégorie voulez-vous ? "))
+        nbr_pages = int(input("Combien de page par catégorie voulez-vous ? "))
 
         ''' Each 3 next loop ( for ) are used to parse every categories and every pages to add each product in
             the database. '''
@@ -94,7 +94,7 @@ class NewDB:  # Class that create the database
             cursor.execute("INSERT INTO categories (category) VALUES (%s)", (category, ))
             cnx.commit()
 
-            for page in range(nbr_of_pages):
+            for page in range(nbr_pages):
                 page = page + 1
                 addr = categories["tags"][i]["url"] + "/" + str(page) + ".json"
                 p = requests.get(addr)
