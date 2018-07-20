@@ -136,24 +136,25 @@ class Console:  # Main class of the program
                                             print("\nID: {prod_id},\nNom: {name},\nDesc: {description},\n"
                                                   "Note: {grade},\nEnergie: {kcal_100g},\nLien: {link}\n".format(**row))  # Then print the results
 
-                                except ValueError:
-                                    print("\nLes lettres ne sont pas autorisées")
+                                        add_sub = 1
 
-                                    add_sub = 1
-
-                                    while add_sub:
-                                        try:
-                                            prod_sub = int(input("Veuillez entrer l'ID du substitut que vous souhaitez: "))
-                                            cursor.execute("UPDATE usr_products"
-                                                           " SET prod_substitute_id = %s WHERE prod_id = %s", (prod_sub,
+                                        while add_sub:
+                                            try:
+                                                prod_sub = int(input("Veuillez entrer l'ID du substitut que vous souhaitez: "))
+                                                cursor.execute("UPDATE usr_products"
+                                                               " SET prod_substitute_id = %s WHERE prod_id = %s", (prod_sub,
                                                                                                                product_id,))  # And finally the req that add the substitute into the database
-                                            cnx.commit()
-                                            another_prime_menu = 0
-                                            add_sub = 0
-                                            self.menu()
+                                                cnx.commit()
+                                                another_prime_menu = 0
+                                                add_sub = 0
+                                                self.menu()
 
-                                        except ValueError:
-                                            print("\nLes lettres ne sont pas autorisées !")
+                                            except ValueError:
+
+                                                print("\nLes lettres ne sont pas autorisées !")
+
+                                except ValueError:
+                                     print("\nLes lettres ne sont pas autorisées")
 
                         except ValueError:
                             print("\nJ'ai dit que des chiffres !")
@@ -251,9 +252,9 @@ class Console:  # Main class of the program
         while find_substitute_while:
 
             try:
-                substitue = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez substituer: "))  # The user need to enter the product's ID of the one he want to substitute
+                substitut = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez substituer: "))  # The user need to enter the product's ID of the one he want to substitute
 
-                cursor.execute("SELECT cat_id, grade, kcal_100g FROM products WHERE prod_id = %s", (substitue, ))  # Select the category's ID, grade and the energy per 100g as criteria to find substitute
+                cursor.execute("SELECT cat_id, grade, kcal_100g FROM products WHERE prod_id = %s", (substitut, ))  # Select the category's ID, grade and the energy per 100g as criteria to find substitute
 
                 for row in cursor:
 
@@ -268,11 +269,11 @@ class Console:  # Main class of the program
 
 
 
-                    cursor.execute("SELECT prod_id, name FROM products WHERE prod_id = %s", (substitue, ))  # Another SQL req to display the product id and the name of the product...
+                    cursor.execute("SELECT prod_id, name FROM products WHERE prod_id = %s", (substitut, ))  # Another SQL req to display the product id and the name of the product...
 
                     for row in cursor:
                         which_one = int(input("Entrez l'ID du produit substituant: ({prod_id}) {name} ?".format(**row)))  # ...Here in case of the user forgot for what he asking a substitute
-                        cursor.execute("UPDATE usr_products SET prod_id = %s, prod_substitute_id = %s WHERE prod_id = %s", (substitue, which_one, substitue, ))  # Then update the line whith the substitute ID where the product ID is
+                        cursor.execute("UPDATE usr_products SET prod_id = %s, prod_substitute_id = %s WHERE prod_id = %s", (substitut, which_one, substitut, ))  # Then update the line whith the substitute ID where the product ID is
                         cnx.commit()
                         self.menu()
                         find_substitute_while = 0
