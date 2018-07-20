@@ -53,7 +53,7 @@ class Console:  # Main class of the program
                     sel_cat = 0
                     cursor.execute("SELECT * FROM products WHERE cat_id = '%s'", (id_sel, ))
                     for row in cursor:
-                        print("Produit: {name}, Note: {grade}, ID: {prod_id}, Lien: {link}".format(**row))
+                        print("Produit: {name}, Note: {grade}, ID: {prod_id}, Lien: {url}".format(**row))
 
             except ValueError:
                 # End of this first try...except block. If there are str in 'id_sel' than reply "You can't use chars"
@@ -96,7 +96,7 @@ class Console:  # Main class of the program
 
                                 else:  # Otherwise register it into the database
                                     print("Enregistrement en cours...")
-                                    cursor.execute("INSERT INTO usr_products (prod_id) VALUES (%s)"  
+                                    cursor.execute("INSERT INTO user_products (prod_id) VALUES (%s)"  
                                                    " ON DUPLICATE KEY UPDATE prod_id = prod_id", (product_id, ))
 
                                     cnx.commit()
@@ -135,19 +135,19 @@ class Console:  # Main class of the program
                                         grade_pro_fetch = cursor.fetchone()
                                         grade_prod = grade_pro_fetch['grade']
 
-                                        cursor.execute("SELECT kcal_100g FROM products WHERE prod_id = %(c)s",
+                                        cursor.execute("SELECT kj_100g FROM products WHERE prod_id = %(c)s",
                                                        {'c': product_id})
                                         nrg = cursor.fetchone()
-                                        enrgy_prod = nrg['kcal_100g']
+                                        enrgy_prod = nrg['kj_100g']
 
                                         # SQl req to search a substitute based on the criteria mentioned previously
                                         cursor.execute("SELECT * FROM products WHERE"
-                                                       " cat_id = %s AND grade <= %s AND kcal_100g <= %s",
+                                                       " cat_id = %s AND grade <= %s AND kj_100g <= %s",
                                                        (cat_prod_id, grade_prod, enrgy_prod, ))
 
                                         for row in cursor:  # Then print the results
                                             print("\nID: {prod_id},\nNom: {name},\nDesc: {description},\n"
-                                                  "Note: {grade},\nEnergie: {kcal_100g},\nLien: {link}\n".format(**row))
+                                                  "Note: {grade},\nEnergie: {kj_100g},\nLien: {url}\n".format(**row))
 
                                         add_sub = 1
 
@@ -157,7 +157,7 @@ class Console:  # Main class of the program
                                                                      " que vous souhaitez: "))
 
                                                 # And finally the req that add the substitute into the database
-                                                cursor.execute("UPDATE usr_products"
+                                                cursor.execute("UPDATE user_products"
                                                                " SET prod_substitute_id = %s WHERE prod_id = %s",
                                                                (prod_sub, product_id,))
                                                 cnx.commit()
@@ -204,7 +204,7 @@ class Console:  # Main class of the program
 
             for row in cursor:
                 # Then print the results
-                print("Produit: {name}, Note: {grade}, ID: {prod_id}, Lien: {link}".format(**row))
+                print("Produit: {name}, Note: {grade}, ID: {prod_id}, Lien: {url}".format(**row))
                 find_it = 0
         time.sleep(0.5)
         self.menu_find(cursor)
@@ -245,9 +245,9 @@ class Console:  # Main class of the program
                         print("Enregistrement en cours...")
 
                         ''' SQL req which inject the product ID contained into "product_id" var
-                         into the usr_products table '''
+                         into the user_products table '''
 
-                        cursor.execute("INSERT INTO usr_products (prod_id) VALUES (%s)"
+                        cursor.execute("INSERT INTO user_products (prod_id) VALUES (%s)"
                                        " ON DUPLICATE KEY UPDATE prod_id = prod_id", (product_id, ))
                         cnx.commit()
                         print("Retour au menu principal...")
@@ -281,19 +281,19 @@ class Console:  # Main class of the program
                 substitut = int(input("\nVeuillez entrer l'ID du produit que vous souhaitez substituer: "))
 
                 # Select the category's ID, grade and the energy per 100g as criteria to find substitute
-                cursor.execute("SELECT cat_id, grade, kcal_100g FROM products WHERE prod_id = %s", (substitut, ))
+                cursor.execute("SELECT cat_id, grade, kj_100g FROM products WHERE prod_id = %s", (substitut, ))
 
                 for row in cursor:
 
                     # Then compare every product of the same category with the grade and the energy per 100g
                     cursor.execute("SELECT * FROM products"
-                                   " WHERE cat_id = {cat_id} AND grade <= '{grade}' AND kcal_100g <= {kcal_100g}"
+                                   " WHERE cat_id = {cat_id} AND grade <= '{grade}' AND kj_100g <= {kj_100g}"
                                    " ORDER by grade ASC".format(**row))
 
                     for row in cursor:
 
                         print("\nID: {prod_id},\nNom: {name},\nDesc: {description},\nNote: {grade},\nEnergie:"
-                              " {kcal_100g},\nLien: {link}\n".format(**row))  # And display them
+                              " {kj_100g},\nLien: {url}\n".format(**row))  # And display them
 
                     # Another SQL req to display the product id and the name of the product...
                     cursor.execute("SELECT prod_id, name FROM products WHERE prod_id = %s", (substitut, ))
@@ -304,7 +304,7 @@ class Console:  # Main class of the program
                         which_one = int(input("Entrez l'ID du produit substituant: ({prod_id}) {name} ?".format(**row)))
 
                         # Then update the line whith the substitute ID where the product ID is
-                        cursor.execute("UPDATE usr_products"
+                        cursor.execute("UPDATE user_products"
                                        " SET prod_id = %s, prod_substitute_id = %s WHERE prod_id = %s",
                                        (substitut, which_one, substitut, ))
                         cnx.commit()
@@ -339,7 +339,7 @@ class Console:  # Main class of the program
                         self.find(cursor)
                     elif choice_menu == 3:
                         menu = 0
-                        self.usr_products(cursor)
+                        self.user_products(cursor)
                     elif choice_menu == 4:
                         self.find_substitute(cursor)
                         menu = 0
@@ -356,7 +356,7 @@ class Console:  # Main class of the program
             except ValueError:
                 print("\nLes lettres sont interdites !")
 
-    def usr_products(self, cursor):  # Method that describe how the user_products's database work
+    def user_products(self, cursor):  # Method that describe how the user_products's database work
 
         cnx = mysql.connector.connect(**config)
         cursor = cnx.cursor(dictionary=True)
@@ -366,11 +366,11 @@ class Console:  # Main class of the program
             everything'''
 
         cursor.execute("SELECT p.name AS prod_name, p.grade AS prod_grade, p.store AS prod_store, "
-                       "p.kcal_100g AS prod_energy, p.link AS prod_link, p.description AS prod_desc,"
+                       "p.kj_100g AS prod_energy, p.url AS prod_link, p.description AS prod_desc,"
                        " p.prod_id AS produ_id, "
-                       "sp.name AS sub_name, sp.grade AS sub_grade, sp.store AS sub_store, sp.kcal_100g AS sub_energy,"
-                       " sp.link AS sub_link, sp.description AS sub_desc, sp.prod_id AS sub_prod_id "
-                       "FROM usr_products up INNER JOIN products p ON up.prod_id = p.prod_id "
+                       "sp.name AS sub_name, sp.grade AS sub_grade, sp.store AS sub_store, sp.kj_100g AS sub_energy,"
+                       " sp.url AS sub_link, sp.description AS sub_desc, sp.prod_id AS sub_prod_id "
+                       "FROM user_products up INNER JOIN products p ON up.prod_id = p.prod_id "
                        "LEFT JOIN products sp ON up.prod_substitute_id = sp.prod_id")
 
         for row in cursor:            # "\033[4m" display the word with underlines
@@ -406,11 +406,11 @@ class Console:  # Main class of the program
                     usr_del = int(input("Veuillez entrer l'ID du produit à supprimer: "))
                     print("Suppression en cours...")
                     time.sleep(0.5)
-                    cursor.execute("DELETE FROM usr_products WHERE prod_id = %s", (usr_del, ))
+                    cursor.execute("DELETE FROM user_products WHERE prod_id = %s", (usr_del, ))
                     cnx.commit()
                     print("Suppression faite !")
                     time.sleep(0.5)
-                    self.usr_products(cursor)
+                    self.user_products(cursor)
 
                 elif usr_choice == 2:
                     self.menu()
