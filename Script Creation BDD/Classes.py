@@ -1,9 +1,10 @@
 import mysql.connector
 from mysql.connector import errorcode
-import time
-from math import ceil
 import json
 import requests
+import time
+from math import ceil
+
 
 config = {  # Args used to create the database
     'host': '172.18.0.1',
@@ -50,13 +51,13 @@ class NewDB:  # Class that create the database
 
             cursor.execute("CREATE TABLE IF NOT EXISTS products(prod_id INT AUTO_INCREMENT PRIMARY KEY,"
                            "name VARCHAR(255), store VARCHAR(255),"
-                           "grade VARCHAR(1), kcal_100g INT,"
-                           "cat_id INT, foreign key (cat_id) REFERENCES categories(id), link VARCHAR(255),"
+                           "grade VARCHAR(1), kj_100g INT,"
+                           "cat_id INT, foreign key (cat_id) REFERENCES categories(id), url VARCHAR(255),"
                            "description TEXT)")
 
             time.sleep(2)
 
-            cursor.execute("CREATE TABLE IF NOT EXISTS usr_products(id INT AUTO_INCREMENT PRIMARY KEY, prod_id INT "
+            cursor.execute("CREATE TABLE IF NOT EXISTS user_products(id INT AUTO_INCREMENT PRIMARY KEY, prod_id INT "
                            "NOT NULL, UNIQUE (prod_id),"
                            "foreign key (prod_id) REFERENCES products(prod_id), prod_substitute_id INT,"
                            "foreign key (prod_substitute_id) REFERENCES products(prod_id))")
@@ -130,7 +131,7 @@ class NewDB:  # Class that create the database
 
                         #  And add everything into the products table
 
-                        cursor.execute("INSERT INTO products (name, store, grade, kcal_100g, cat_id, link,"
+                        cursor.execute("INSERT INTO products (name, store, grade, kj_100g, cat_id, url,"
                                        "description) VALUES (%s,"
                                        "%s, %s, %s, %s, %s, %s)", (name_prod, store_prod, grade_prod, energy_prod, cate_id, url_prod, desc_prod))
 
